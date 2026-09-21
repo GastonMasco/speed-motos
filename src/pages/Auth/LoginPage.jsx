@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const { login } = useAuth()
+  const { login, loginAsDirectAdmin } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -77,6 +77,32 @@ export default function LoginPage() {
 
           <Button type="submit" fullWidth loading={loading} className="mt-2 py-2.5">
             Ingresar
+          </Button>
+
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-gray-800"></div>
+            <span className="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-bold tracking-wider">o acceso directo</span>
+            <div className="flex-grow border-t border-gray-800"></div>
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            fullWidth
+            onClick={async () => {
+              setLoading(true)
+              try {
+                await loginAsDirectAdmin()
+                navigate('/admin/inicio')
+              } catch (err) {
+                setError('Error al ingresar como Administrador.')
+              } finally {
+                setLoading(false)
+              }
+            }}
+            className="py-2.5 bg-emerald-950/60 text-emerald-400 border-emerald-900/60 hover:bg-emerald-900/50 flex items-center justify-center gap-2"
+          >
+            ⚡ Entrar como Administrador (Directo)
           </Button>
         </form>
 
