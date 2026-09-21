@@ -152,19 +152,10 @@ export const AuthProvider = ({ children }) => {
     })
 
     if (error) {
+      if (error.message.includes('User already registered')) {
+        throw new Error('Este correo electrónico ya está registrado. Por favor selecciona "Inicia sesión aquí".')
+      }
       throw error
-    }
-
-    if (data.user) {
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        email,
-        nombre_completo: nombreCompleto,
-        telefono: telefono || '',
-        rol: 'vendedor',
-        estado: 'pendiente',
-      })
-      await fetchProfile(data.user.id, data.user.email, data.user.user_metadata)
     }
 
     return data
