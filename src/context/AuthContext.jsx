@@ -155,6 +155,9 @@ export const AuthProvider = ({ children }) => {
       if (error.message.includes('User already registered')) {
         throw new Error('Este correo electrónico ya está registrado. Por favor selecciona "Inicia sesión aquí".')
       }
+      if (error.message.includes('rate limit') || error.code === 'over_email_send_rate_limit' || error.status === 429) {
+        throw new Error('Supabase bloqueó el registro por límite de correos. En Supabase -> Authentication -> Providers -> Email, desactiva la casilla "Confirm email".')
+      }
       throw error
     }
 
