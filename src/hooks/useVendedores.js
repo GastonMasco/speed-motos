@@ -23,7 +23,23 @@ export const useVendedores = () => {
       // Combinar con anulaciones locales almacenadas
       const merged = list.map(v => {
         const override = localOverrides[v.id] || localOverrides[v.email]
-        return override ? { ...v, estado: override } : v
+        let item = { ...v }
+
+        if (override) {
+          if (typeof override === 'object') {
+            item = { ...item, ...override }
+          } else {
+            item.estado = override
+          }
+        }
+
+        // mascogaston@gmail.com es Administrador por defecto
+        if (v.email === 'mascogaston@gmail.com') {
+          item.rol = 'admin'
+          item.estado = 'activo'
+        }
+
+        return item
       })
 
       // Ordenar destacando los "pendientes" en primer lugar
@@ -92,6 +108,47 @@ export const useVendedores = () => {
     }
   }
 
+  // Promover usuario a Administrador
+  const hacerAdmin = async (userId) => {
+    let targetEmail = null
+
+    setVendedores(prev =>
+      prev.map(v => {
+        if (v.id === userId || v.email === userId) {
+          targetEmail = v.email
+          return { ...v, rol: 'admin', estado: 'activo' }
+        }
+        return v
+      })
+    )
+
+    try {
+      const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+      const overrideObj = { rol: 'admin', estado: 'activo' }
+      localOverrides[userId] = overrideObj
+      if (targetEmail) localOverrides[targetEmail] = overrideObj
+      localStorage.setItem('speedmotos_profiles_overrides', JSON.stringify(localOverrides))
+    } catch (e) {
+      console.warn('No se pudo guardar override de admin en localStorage:', e)
+    }
+
+    try {
+      let { error } = await supabase
+        .from('profiles')
+        .update({ rol: 'admin', estado: 'activo' })
+        .eq('id', userId)
+
+      if (error && targetEmail) {
+        await supabase
+          .from('profiles')
+          .update({ rol: 'admin', estado: 'activo' })
+          .eq('email', targetEmail)
+      }
+    } catch (err) {
+      console.warn('Excepción al promover a Admin en Supabase:', err)
+    }
+  }
+
   const rechazarVendedor = async (userId) => {
     return cambiarEstado(userId, 'suspendido')
   }
@@ -104,6 +161,7 @@ export const useVendedores = () => {
     suspenderVendedor: (id) => cambiarEstado(id, 'suspendido'),
     reactivarVendedor: (id) => cambiarEstado(id, 'activo'),
     rechazarVendedor,
+    hacerAdmin,
   }
 }
 

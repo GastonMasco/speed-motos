@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, UserCheck, UserX, ShieldAlert, CheckCircle, Phone, Mail, Clock } from 'lucide-react'
+import { Users, UserCheck, UserX, ShieldAlert, CheckCircle, ShieldCheck, Phone, Mail, Clock } from 'lucide-react'
 import { useVendedores } from '../../hooks/useVendedores'
 import { formatDateShort } from '../../utils/formatters'
 import { Card } from '../../components/ui/Card'
@@ -14,6 +14,7 @@ export default function AdminVendedoresPage() {
     suspenderVendedor,
     reactivarVendedor,
     rechazarVendedor,
+    hacerAdmin,
   } = useVendedores()
 
   const [processingId, setProcessingId] = useState(null)
@@ -155,16 +156,50 @@ export default function AdminVendedoresPage() {
 
                     {/* Botones para vendedores ACTIVOS */}
                     {isActive && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          loading={processingId === vendedor.id}
+                          onClick={() => handleAction(hacerAdmin, vendedor.id)}
+                          className="flex items-center gap-1 text-xs text-rose-400 border-rose-900/60 hover:bg-rose-950/40"
+                        >
+                          <ShieldCheck size={14} /> Hacer Admin
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          loading={processingId === vendedor.id}
+                          onClick={() => handleAction(suspenderVendedor, vendedor.id)}
+                          className="flex items-center gap-1 text-xs"
+                        >
+                          <ShieldAlert size={14} /> Suspender
+                        </Button>
+                      </>
+                    )}
+
+                    {/* Botones para vendedores SUSPENDIDOS */}
+                    {isSuspended && (
                       <Button
-                        variant="danger"
+                        variant="secondary"
                         size="sm"
                         loading={processingId === vendedor.id}
-                        onClick={() => handleAction(suspenderVendedor, vendedor.id)}
-                        className="flex items-center gap-1 text-xs"
+                        onClick={() => handleAction(reactivarVendedor, vendedor.id)}
+                        className="flex items-center gap-1 text-xs text-emerald-400 border-emerald-900"
                       >
-                        <ShieldAlert size={14} /> Suspender
+                        <CheckCircle size={14} /> Reactivar
                       </Button>
                     )}
+                  </div>
+                )}
+              </Card>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
                     {/* Botones para vendedores SUSPENDIDOS */}
                     {isSuspended && (
