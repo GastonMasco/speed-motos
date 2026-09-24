@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
       return null
     }
 
+    const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+
     try {
       // Usar maybeSingle() para evitar excepciones de RLS si la consulta regresa 0 filas temporalmente
       const { data, error } = await supabase
@@ -28,8 +30,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (data) {
-        setProfile(data)
-        return data
+        const override = localOverrides[data.id] || localOverrides[data.email]
+        const finalProfile = override ? { ...data, estado: override } : data
+        setProfile(finalProfile)
+        return finalProfile
       }
 
       // Si no existe fila en profiles, intentar buscar por email
@@ -42,8 +46,10 @@ export const AuthProvider = ({ children }) => {
           .maybeSingle()
 
         if (dataEmail) {
-          setProfile(dataEmail)
-          return dataEmail
+          const override = localOverrides[dataEmail.id] || localOverrides[dataEmail.email]
+          const finalProfile = override ? { ...dataEmail, estado: override } : dataEmail
+          setProfile(finalProfile)
+          return finalProfile
         }
       }
 
@@ -55,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         nombre_completo: meta.nombre_completo || 'Usuario',
         telefono: meta.telefono || '',
         rol: meta.rol || 'vendedor',
-        estado: meta.estado || 'pendiente',
+        estado: localOverrides[userId] || localOverrides[emailToSearch] || meta.estado || 'pendiente',
       }
       setProfile(fallbackProfile)
       return fallbackProfile

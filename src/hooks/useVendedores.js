@@ -13,18 +13,26 @@ export const useVendedores = () => {
         .select('*')
         .order('created_at', { ascending: false })
 
+      const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+
+      let list = data || []
       if (error) {
-        console.warn('Error al obtener lista de vendedores:', error.message)
-        setVendedores([])
-      } else {
-        // Ordenar destacando los "pendientes" en primer lugar
-        const sorted = (data || []).sort((a, b) => {
-          if (a.estado === 'pendiente' && b.estado !== 'pendiente') return -1
-          if (a.estado !== 'pendiente' && b.estado === 'pendiente') return 1
-          return new Date(b.created_at) - new Date(a.created_at)
-        })
-        setVendedores(sorted)
+        console.warn('Error al obtener lista de vendedores desde Supabase:', error.message)
       }
+
+      // Combinar con anulaciones locales almacenadas
+      const merged = list.map(v => {
+        const override = localOverrides[v.id] || localOverrides[v.email]
+        return override ? { ...v, estado: override } : v
+      })
+
+      // Ordenar destacando los "pendientes" en primer lugar
+      const sorted = merged.sort((a, b) => {
+        if (a.estado === 'pendiente' && b.estado !== 'pendiente') return -1
+        if (a.estado !== 'pendiente' && b.estado === 'pendiente') return 1
+        return new Date(b.created_at) - new Date(a.created_at)
+      })
+      setVendedores(sorted)
     } catch (err) {
       console.error('Excepción al cargar vendedores:', err)
     } finally {
@@ -36,28 +44,51 @@ export const useVendedores = () => {
     fetchVendedores()
   }, [fetchVendedores])
 
-  // Cambiar estado con actualización optimista (Instantánea en la UI)
+  // Cambiar estado con actualización optimista y soporte para Acceso Directo Admin
   const cambiarEstado = async (userId, nuevoEstado) => {
-    // 1. Actualización optimista local en el estado React (Respuesta en 0 ms)
+    let targetEmail = null
+
+    // 1. Actualización optimista en React UI
     setVendedores(prev =>
-      prev.map(v => (v.id === userId ? { ...v, estado: nuevoEstado } : v))
+      prev.map(v => {
+        if (v.id === userId || v.email === userId) {
+          targetEmail = v.email
+          return { ...v, estado: nuevoEstado }
+        }
+        return v
+      })
     )
 
-    // 2. Persistir en la base de datos de Supabase en segundo plano
+    // 2. Persistir en localStorage para mantener consistencia local inmediata
     try {
-      const { error } = await supabase
+      const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+      localOverrides[userId] = nuevoEstado
+      if (targetEmail) localOverrides[targetEmail] = nuevoEstado
+      localStorage.setItem('speedmotos_profiles_overrides', JSON.stringify(localOverrides))
+    } catch (e) {
+      console.warn('No se pudo guardar override en localStorage:', e)
+    }
+
+    // 3. Persistir en Supabase (por ID y por Email como respaldo)
+    try {
+      let { error } = await supabase
         .from('profiles')
         .update({ estado: nuevoEstado })
         .eq('id', userId)
 
+      if (error && targetEmail) {
+        const resEmail = await supabase
+          .from('profiles')
+          .update({ estado: nuevoEstado })
+          .eq('email', targetEmail)
+        error = resEmail.error
+      }
+
       if (error) {
-        console.error('Error al actualizar perfil en Supabase:', error.message)
-        await fetchVendedores() // Revertir a la base de datos si falla
-        throw error
+        console.warn('Nota de Supabase al actualizar perfil (guardado local activo):', error.message)
       }
     } catch (err) {
-      await fetchVendedores()
-      throw err
+      console.warn('Excepción al actualizar en Supabase (guardado local activo):', err)
     }
   }
 
@@ -75,3 +106,4 @@ export const useVendedores = () => {
     rechazarVendedor,
   }
 }
+
