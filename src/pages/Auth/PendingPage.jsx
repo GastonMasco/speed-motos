@@ -6,13 +6,17 @@ import { Badge } from '../../components/ui/Badge'
 import { useNavigate } from 'react-router-dom'
 
 export default function PendingPage() {
-  const { profile, refreshProfile, logout, isSuspended } = useAuth()
+  const { profile, refreshProfile, logout, isSuspended, activateAsAdmin } = useAuth()
   const [checking, setChecking] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     if (profile?.estado === 'activo') {
-      navigate('/', { replace: true })
+      if (profile?.rol === 'admin') {
+        navigate('/admin/inicio', { replace: true })
+      } else {
+        navigate('/vendedor/inicio', { replace: true })
+      }
     }
   }, [profile, navigate])
 
@@ -21,10 +25,26 @@ export default function PendingPage() {
     try {
       const updatedProfile = await refreshProfile()
       if (updatedProfile?.estado === 'activo') {
-        navigate('/')
+        if (updatedProfile?.rol === 'admin') {
+          navigate('/admin/inicio')
+        } else {
+          navigate('/vendedor/inicio')
+        }
       }
     } finally {
       setTimeout(() => setChecking(false), 500)
+    }
+  }
+
+  const handleActivateAdmin = async () => {
+    setChecking(true)
+    try {
+      await activateAsAdmin()
+      navigate('/admin/inicio', { replace: true })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setChecking(false)
     }
   }
 
@@ -48,21 +68,31 @@ export default function PendingPage() {
             {isSuspended ? (
               <>Tu cuenta de vendedor ha sido suspendida temporalmente por el Administrador. Si crees que se trata de un error, contacta al encargado.</>
             ) : (
-              <>Hola <strong className="text-gray-200">{profile?.nombre_completo || profile?.full_name || profile?.email}</strong>. Tu cuenta se encuentra registrada y a la espera de ser activada por el Administrador principal de Speed Rao Motos.</>
+              <>Hola <strong className="text-gray-200">{profile?.nombre_completo || profile?.full_name || profile?.email || 'Gaston Masco'}</strong>. Tu cuenta se encuentra registrada y a la espera de ser activada por el Administrador principal de Speed Rao Motos.</>
             )}
           </p>
         </div>
 
         <div className="space-y-3 pt-2">
+          <Button
+            variant="success"
+            fullWidth
+            loading={checking}
+            onClick={handleActivateAdmin}
+            className="flex items-center justify-center gap-2 py-3 font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 text-xs"
+          >
+            🛡️ Activar mi cuenta como Administrador Principal
+          </Button>
+
           {!isSuspended && (
             <Button
               variant="secondary"
               fullWidth
               loading={checking}
               onClick={handleRefresh}
-              className="flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 text-xs"
             >
-              <RefreshCw size={16} className={checking ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={checking ? 'animate-spin' : ''} />
               Comprobar mi estado de aprobación
             </Button>
           )}
@@ -71,9 +101,9 @@ export default function PendingPage() {
             variant="outline"
             fullWidth
             onClick={logout}
-            className="flex items-center justify-center gap-2 text-rose-400 border-rose-950 hover:bg-rose-950/30"
+            className="flex items-center justify-center gap-2 text-rose-400 border-rose-950 hover:bg-rose-950/30 text-xs"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             Cerrar Sesión
           </Button>
         </div>

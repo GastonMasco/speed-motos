@@ -200,26 +200,3 @@ export default function AdminVendedoresPage() {
     </div>
   )
 }
-
-                    {/* Botones para vendedores SUSPENDIDOS */}
-                    {isSuspended && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        loading={processingId === vendedor.id}
-                        onClick={() => handleAction(reactivarVendedor, vendedor.id)}
-                        className="flex items-center gap-1 text-xs text-emerald-400 border-emerald-900"
-                      >
-                        <CheckCircle size={14} /> Reactivar
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </Card>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}

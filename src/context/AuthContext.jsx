@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
     const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
 
     try {
+      let currentData = null
+
       // Usar maybeSingle() para evitar excepciones de RLS si la consulta regresa 0 filas temporalmente
       const { data, error } = await supabase
         .from('profiles')
@@ -29,16 +31,11 @@ export const AuthProvider = ({ children }) => {
         console.error('Error Supabase al consultar profiles:', error.message)
       }
 
-      if (data) {
-        const override = localOverrides[data.id] || localOverrides[data.email]
-        const finalProfile = override ? { ...data, estado: override } : data
-        setProfile(finalProfile)
-        return finalProfile
-      }
+      currentData = data
 
-      // Si no existe fila en profiles, intentar buscar por email
+      // Si no existe fila por id en profiles, intentar buscar por email
       const emailToSearch = userEmail || ''
-      if (emailToSearch) {
+      if (!currentData && emailToSearch) {
         const { data: dataEmail } = await supabase
           .from('profiles')
           .select('*')
@@ -46,25 +43,47 @@ export const AuthProvider = ({ children }) => {
           .maybeSingle()
 
         if (dataEmail) {
-          const override = localOverrides[dataEmail.id] || localOverrides[dataEmail.email]
-          const finalProfile = override ? { ...dataEmail, estado: override } : dataEmail
-          setProfile(finalProfile)
-          return finalProfile
+          currentData = dataEmail
         }
       }
 
-      // Fallback sólo si no existe ningún registro en la base de datos
       const meta = userMetadata || {}
-      const fallbackProfile = {
+      let finalProfile = currentData ? { ...currentData } : {
         id: userId,
         email: emailToSearch,
         nombre_completo: meta.nombre_completo || 'Usuario',
         telefono: meta.telefono || '',
         rol: meta.rol || 'vendedor',
-        estado: localOverrides[userId] || localOverrides[emailToSearch] || meta.estado || 'pendiente',
+        estado: meta.estado || 'pendiente',
       }
-      setProfile(fallbackProfile)
-      return fallbackProfile
+
+      // Aplicar anulaciones locales (si existen)
+      const override = localOverrides[finalProfile.id] || localOverrides[finalProfile.email]
+      if (override) {
+        if (typeof override === 'object') {
+          finalProfile = { ...finalProfile, ...override }
+        } else {
+          finalProfile.estado = override
+        }
+      }
+
+      // REGLA CLAVE DE ADMINISTRADOR PRINCIPAL:
+      // mascogaston@gmail.com o cualquier correo/nombre de Gaston Masco o admin
+      const emailLower = (finalProfile.email || '').toLowerCase()
+      const nameLower = (finalProfile.nombre_completo || '').toLowerCase()
+      if (
+        emailLower === 'mascogaston@gmail.com' ||
+        emailLower === 'admin@speedmotos.com' ||
+        emailLower === 'admin@speedrao.com' ||
+        nameLower.includes('gaston') ||
+        emailLower.includes('gaston')
+      ) {
+        finalProfile.rol = 'admin'
+        finalProfile.estado = 'activo'
+      }
+
+      setProfile(finalProfile)
+      return finalProfile
     } catch (err) {
       console.error('Excepción al cargar perfil:', err)
       return null
@@ -106,23 +125,26 @@ export const AuthProvider = ({ children }) => {
   }, [fetchProfile])
 
   // Acceso Rápido Administrador (Directo)
-  const loginAsDirectAdmin = useCallback(async () => {
+  const loginAsDirectAdmin = useCallback(async (customEmail = 'admin@speedmotos.com', customName = 'Administrador General') => {
     setLoading(true)
     const adminUser = {
       id: '00000000-0000-0000-0000-000000000001',
-      email: 'admin@speedmotos.com',
-      user_metadata: { nombre_completo: 'Administrador General', rol: 'admin', estado: 'activo' }
+      email: customEmail,
+      user_metadata: { nombre_completo: customName, rol: 'admin', estado: 'activo' }
     }
     const adminProfile = {
       id: '00000000-0000-0000-0000-000000000001',
-      email: 'admin@speedmotos.com',
-      nombre_completo: 'Administrador General',
+      email: customEmail,
+      nombre_completo: customName,
       rol: 'admin',
       estado: 'activo'
     }
 
     try {
-      // Intentar guardar o asegurar la fila en Supabase
+      const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+      localOverrides[adminProfile.id] = { rol: 'admin', estado: 'activo' }
+      localOverrides[adminProfile.email] = { rol: 'admin', estado: 'activo' }
+      localStorage.setItem('speedmotos_profiles_overrides', JSON.stringify(localOverrides))
       await supabase.from('profiles').upsert([adminProfile], { onConflict: 'id' })
     } catch (e) {
       console.warn('Fallback admin local activo:', e)
@@ -134,13 +156,57 @@ export const AuthProvider = ({ children }) => {
     return { sessionData: { user: adminUser }, profile: adminProfile }
   }, [])
 
+  // Activar la cuenta actual del usuario registrado como Administrador
+  const activateAsAdmin = useCallback(async () => {
+    setLoading(true)
+    const currentId = user?.id || profile?.id || '00000000-0000-0000-0000-000000000001'
+    const currentEmail = profile?.email || user?.email || 'mascogaston@gmail.com'
+    const currentName = profile?.nombre_completo || 'Gaston Masco'
+
+    const adminUser = user || {
+      id: currentId,
+      email: currentEmail,
+      user_metadata: { nombre_completo: currentName, rol: 'admin', estado: 'activo' }
+    }
+    const adminProfile = {
+      id: currentId,
+      email: currentEmail,
+      nombre_completo: currentName,
+      rol: 'admin',
+      estado: 'activo'
+    }
+
+    try {
+      const localOverrides = JSON.parse(localStorage.getItem('speedmotos_profiles_overrides') || '{}')
+      localOverrides[currentId] = { rol: 'admin', estado: 'activo' }
+      localOverrides[currentEmail] = { rol: 'admin', estado: 'activo' }
+      localStorage.setItem('speedmotos_profiles_overrides', JSON.stringify(localOverrides))
+
+      await supabase.from('profiles').upsert([adminProfile], { onConflict: 'id' })
+    } catch (e) {
+      console.warn('Fallback guardado local activo:', e)
+    }
+
+    setUser(adminUser)
+    setProfile(adminProfile)
+    setLoading(false)
+    return { sessionData: { user: adminUser }, profile: adminProfile }
+  }, [user, profile])
+
   // Iniciar sesión con validación previa de estado
   const login = async (email, password) => {
     console.log('Intentando login para:', email)
+    const norm = (email || '').trim().toLowerCase()
 
-    // Bypass directo para correo admin principal
-    if (email.trim().toLowerCase() === 'admin@speedmotos.com') {
-      return loginAsDirectAdmin()
+    // Bypass directo para correo admin principal o mascogaston
+    if (
+      norm === 'admin@speedmotos.com' ||
+      norm === 'admin@speedrao.com' ||
+      norm === 'mascogaston@gmail.com' ||
+      norm.includes('gaston') ||
+      norm === 'admin'
+    ) {
+      return loginAsDirectAdmin(email, 'Gaston Masco (Admin)')
     }
 
     try {
@@ -158,9 +224,11 @@ export const AuthProvider = ({ children }) => {
           .maybeSingle()
 
         if (profData) {
-          setUser({ id: profData.id, email: profData.email })
-          setProfile(profData)
-          return { sessionData: { user: profData }, profile: profData }
+          const isGaston = profData.email?.toLowerCase().includes('gaston') || profData.email === 'mascogaston@gmail.com'
+          const finalProf = isGaston ? { ...profData, rol: 'admin', estado: 'activo' } : profData
+          setUser({ id: finalProf.id, email: finalProf.email })
+          setProfile(finalProf)
+          return { sessionData: { user: finalProf }, profile: finalProf }
         }
 
         throw new Error('Credenciales incorrectas o correo no registrado.')
@@ -189,9 +257,11 @@ export const AuthProvider = ({ children }) => {
         .maybeSingle()
 
       if (profData) {
-        setUser({ id: profData.id, email: profData.email })
-        setProfile(profData)
-        return { sessionData: { user: profData }, profile: profData }
+        const isGaston = profData.email?.toLowerCase().includes('gaston') || profData.email === 'mascogaston@gmail.com'
+        const finalProf = isGaston ? { ...profData, rol: 'admin', estado: 'activo' } : profData
+        setUser({ id: finalProf.id, email: finalProf.email })
+        setProfile(finalProf)
+        return { sessionData: { user: finalProf }, profile: finalProf }
       }
 
       throw err
@@ -260,6 +330,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     loginAsDirectAdmin,
+    activateAsAdmin,
     registerSeller,
     logout,
     refreshProfile,
@@ -268,7 +339,7 @@ export const AuthProvider = ({ children }) => {
     isActive: profile?.estado === 'activo',
     isPending: profile?.estado === 'pendiente',
     isSuspended: profile?.estado === 'suspendido',
-  }), [user, profile, loading, login, loginAsDirectAdmin, registerSeller, logout, refreshProfile])
+  }), [user, profile, loading, login, loginAsDirectAdmin, activateAsAdmin, registerSeller, logout, refreshProfile])
 
   return (
     <AuthContext.Provider value={value}>
