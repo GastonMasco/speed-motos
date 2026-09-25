@@ -198,7 +198,7 @@ export default function AdminConfiguracionPage({ defaultTab = 'negocio' }) {
 
             <Input
               label="Nombre Comercial del Negocio *"
-              placeholder="Ej: Speed Rao Motos"
+              placeholder="Ej: Motos Service Oraqueni"
               value={businessForm.nombre_negocio}
               onChange={(e) => setBusinessForm({ ...businessForm, nombre_negocio: e.target.value })}
               required

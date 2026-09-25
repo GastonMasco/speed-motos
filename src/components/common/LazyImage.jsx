@@ -4,7 +4,7 @@ const DEFAULT_PLACEHOLDER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.o
 
 export const LazyImage = memo(({
   src,
-  alt = 'Repuesto Speed Rao Motos',
+  alt = 'Repuesto Motos Service Oraqueni',
   className = '',
   fallbackSrc = DEFAULT_PLACEHOLDER,
   ...props

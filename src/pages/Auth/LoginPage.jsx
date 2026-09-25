@@ -43,7 +43,7 @@ export default function LoginPage() {
           <div className="w-14 h-14 rounded-2xl bg-rose-600 flex items-center justify-center text-white mb-3 shadow-lg shadow-rose-900/40">
             <Wrench size={30} />
           </div>
-          <h1 className="text-xl font-black tracking-wide text-white">SPEED RAO MOTOS</h1>
+          <h1 className="text-xl font-black tracking-wide text-white">MOTOS SERVICE ORAQUENI</h1>
           <p className="text-xs text-gray-400 mt-1">Acceso al Sistema (Repuestos & Taller)</p>
         </div>
 

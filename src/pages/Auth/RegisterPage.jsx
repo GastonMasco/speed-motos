@@ -54,7 +54,7 @@ export default function RegisterPage() {
             <Wrench size={30} />
           </div>
           <h1 className="text-xl font-black tracking-wide text-white">REGISTRO DE VENDEDOR</h1>
-          <p className="text-xs text-gray-400 mt-1">Solicita acceso al sistema de ventas Speed Rao Motos</p>
+          <p className="text-xs text-gray-400 mt-1">Solicita acceso al sistema de ventas Motos Service Oraqueni</p>
         </div>
 
         {error && (

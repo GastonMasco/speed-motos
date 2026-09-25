@@ -372,7 +372,7 @@ export const ReviewListModal = ({
         {/* Botones de Acción */}
         <div className="flex justify-between items-center pt-4 border-t border-gray-800">
           <div className="text-xs text-gray-400">
-            Se importarán <strong className="text-rose-400">{items.filter((i) => i.incluir).length}</strong> repuestos al inventario de Speed Rao Motos.
+            Se importarán <strong className="text-rose-400">{items.filter((i) => i.incluir).length}</strong> repuestos al inventario de Motos Service Oraqueni.
           </div>
 
           <div className="flex gap-3">

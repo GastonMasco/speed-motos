@@ -1,6 +1,6 @@
-# 🏍️ Speed Rao Motos - Progressive Web App (PWA)
+# 🏍️ Motos Service Oraqueni - Progressive Web App (PWA)
 
-Aplicación Web Progresiva ultraliviana y de alto rendimiento diseñada para **Speed Rao Motos** (Venta de repuestos, accesorios y taller de reparaciones de motocicletas en Bolivia).
+Aplicación Web Progresiva ultraliviana y de alto rendimiento diseñada para **Motos Service Oraqueni** (Venta de repuestos, accesorios y taller de reparaciones de motocicletas en La Paz, Bolivia).
 
 ---
 

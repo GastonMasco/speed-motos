@@ -144,7 +144,7 @@ export default function AdminDashboardPage() {
             ¡Hola, {profile?.nombre_completo || 'Administrador'}!
           </h1>
           <p className="text-xs text-gray-300 mt-1">
-            Centro de monitoreo e inteligencia de negocios de <strong>Speed Rao Motos</strong>.
+            Centro de monitoreo e inteligencia de negocios de <strong>Motos Service Oraqueni</strong>.
           </p>
         </div>
 

@@ -30,7 +30,7 @@ export const extractProductsFromPdf = async (pdfFile) => {
     const model = getGeminiModel('gemini-1.5-flash')
 
     const prompt = `
-Eres un experto en extracción de catálogos y listas de precios de repuestos para motocicletas en Bolivia para la empresa "Speed Rao Motos".
+Eres un experto en extracción de catálogos y listas de precios de repuestos para motocicletas en Bolivia para la empresa "Motos Service Oraqueni".
 Analiza minuciosamente el archivo PDF adjunto y extrae TODOS los repuestos contenidos en las listas de precios.
 
 REGLAS CRÍTICAS DE EXTRACCIÓN Y FORMATO:

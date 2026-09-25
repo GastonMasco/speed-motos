@@ -14,7 +14,7 @@ export const ReceiptModal = ({
   if (!sale) return null
 
   const company = {
-    NOMBRE: config.nombre_negocio || 'Speed Rao Motos',
+    NOMBRE: config.nombre_negocio || 'Motos Service Oraqueni',
     ESLOGAN: config.eslogan || 'Venta de Repuestos, Accesorios y Taller Especializado',
     DIRECCION: config.direccion || 'La Paz, Bolivia',
     TELEFONO: config.telefono || '+591 71234567',
@@ -94,7 +94,7 @@ export const ReceiptModal = ({
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(9.5)
       doc.text(`Fecha: ${formatDate(sale.created_at)}`, 14, 52)
-      doc.text(`Vendedor: ${sale.vendedor_nombre || sale.profiles?.nombre_completo || sale.profiles?.full_name || 'Vendedor Speed Rao'}`, 14, 57)
+      doc.text(`Vendedor: ${sale.vendedor_nombre || sale.profiles?.nombre_completo || sale.profiles?.full_name || 'Vendedor Motos Service Oraqueni'}`, 14, 57)
       doc.text(`Cliente: ${sale.cliente_nombre || sale.client_name || 'Cliente Ocasional'}`, 120, 52)
       doc.text(`NIT/CI: ${sale.cliente_nit || sale.client_ci_nit || 'Sin NIT'}`, 120, 57)
       doc.text(`Método Pago: ${(sale.metodo_pago || sale.payment_method || 'Efectivo').toUpperCase()}`, 120, 62)
@@ -147,7 +147,7 @@ export const ReceiptModal = ({
       doc.setFont('helvetica', 'italic')
       doc.setFontSize(8)
       doc.setTextColor(120)
-      doc.text('¡Gracias por su preferencia! Speed Rao Motos - Garantía y Calidad en Repuestos.', 14, 280)
+      doc.text('¡Gracias por su preferencia! Motos Service Oraqueni - Garantía y Calidad en Repuestos.', 14, 280)
 
       doc.save(`Comprobante_${numeroVenta}.pdf`)
     } catch (err) {

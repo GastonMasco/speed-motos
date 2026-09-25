@@ -17,7 +17,7 @@ export default function VendedorDashboardPage() {
           ¡Hola, {profile?.nombre_completo || 'Vendedor'}!
         </h1>
         <p className="text-xs text-gray-300 mt-1">
-          Panel de ventas para <strong>Speed Rao Motos</strong> (La Paz, Bolivia).
+          Panel de ventas para <strong>Motos Service Oraqueni</strong> (La Paz, Bolivia).
         </p>
       </div>
 

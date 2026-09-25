@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Speed Rao Motos',
-        short_name: 'SpeedRao',
+        name: 'Motos Service Oraqueni',
+        short_name: 'MotosOraqueni',
         description: 'Venta de repuestos, accesorios y servicio técnico de reparaciones',
         theme_color: '#111827',
         background_color: '#111827',

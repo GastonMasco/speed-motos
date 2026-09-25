@@ -68,7 +68,7 @@ export default function PendingPage() {
             {isSuspended ? (
               <>Tu cuenta de vendedor ha sido suspendida temporalmente por el Administrador. Si crees que se trata de un error, contacta al encargado.</>
             ) : (
-              <>Hola <strong className="text-gray-200">{profile?.nombre_completo || profile?.full_name || profile?.email || 'Gaston Masco'}</strong>. Tu cuenta se encuentra registrada y a la espera de ser activada por el Administrador principal de Speed Rao Motos.</>
+              <>Hola <strong className="text-gray-200">{profile?.nombre_completo || profile?.full_name || profile?.email || 'Gaston Masco'}</strong>. Tu cuenta se encuentra registrada y a la espera de ser activada por el Administrador principal de Motos Service Oraqueni.</>
             )}
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function PendingPage() {
         </div>
 
         <div className="mt-6 pt-4 border-t border-gray-800 text-[11px] text-gray-500 flex items-center justify-center gap-1">
-          <Wrench size={12} /> Speed Rao Motos - La Paz, Bolivia
+          <Wrench size={12} /> Motos Service Oraqueni - La Paz, Bolivia
         </div>
       </div>
     </div>

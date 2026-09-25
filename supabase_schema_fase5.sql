@@ -5,7 +5,7 @@
 -- 1. TABLA CONFIGURACION_NEGOCIO
 CREATE TABLE IF NOT EXISTS public.configuracion_negocio (
   id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  nombre_negocio TEXT NOT NULL DEFAULT 'Speed Rao Motos',
+  nombre_negocio TEXT NOT NULL DEFAULT 'Motos Service Oraqueni',
   eslogan TEXT DEFAULT 'Venta de Repuestos, Accesorios y Taller Especializado',
   direccion TEXT DEFAULT 'La Paz, Bolivia',
   telefono TEXT DEFAULT '+591 71234567',
@@ -21,7 +21,7 @@ INSERT INTO public.configuracion_negocio (
   id, nombre_negocio, eslogan, direccion, telefono, nit, markup_global_defecto, descuento_maximo_vendedor
 )
 VALUES (
-  1, 'Speed Rao Motos', 'Venta de Repuestos, Accesorios y Taller Especializado',
+  1, 'Motos Service Oraqueni', 'Venta de Repuestos, Accesorios y Taller Especializado',
   'La Paz, Bolivia', '+591 71234567', '1028374029', 40.00, 15.00
 )
 ON CONFLICT (id) DO NOTHING;

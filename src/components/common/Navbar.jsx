@@ -24,10 +24,10 @@ export const Navbar = memo(({ onToggleSidebar }) => {
               <Wrench size={18} />
             </div>
             <div>
-              <span className="font-extrabold text-base tracking-wide bg-gradient-to-r from-rose-500 to-amber-500 bg-clip-text text-transparent">
-                SPEED RAO
+              <span className="font-extrabold text-sm sm:text-base tracking-wide bg-gradient-to-r from-rose-500 to-amber-500 bg-clip-text text-transparent">
+                MOTOS SERVICE
               </span>
-              <span className="hidden sm:inline text-xs text-gray-400 ml-1 font-medium">MOTOS</span>
+              <span className="hidden sm:inline text-xs text-gray-400 ml-1 font-medium">ORAQUENI</span>
             </div>
           </div>
         </div>

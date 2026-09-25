@@ -21,7 +21,7 @@ export default function PlaceholderPage({ title = 'Módulo en Desarrollo', descr
         </p>
 
         <div className="pt-4 border-t border-gray-800 text-[11px] text-gray-500 flex items-center justify-center gap-1">
-          <Wrench size={12} /> Speed Rao Motos PWA
+          <Wrench size={12} /> Motos Service Oraqueni PWA
         </div>
       </Card>
     </div>

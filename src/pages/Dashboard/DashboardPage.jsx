@@ -82,7 +82,7 @@ export default function DashboardPage() {
             ¡Bienvenido, {profile?.full_name || 'Vendedor'}! 👋
           </h1>
           <p className="text-xs text-gray-300 mt-1 max-w-xl leading-relaxed">
-            Gestión en tiempo real para <strong>Speed Rao Motos</strong> (La Paz, Bolivia). Sistema ligero y optimizado para red móvil.
+            Gestión en tiempo real para <strong>Motos Service Oraqueni</strong> (La Paz, Bolivia). Sistema ligero y optimizado para red móvil.
           </p>
         </div>
       </div>

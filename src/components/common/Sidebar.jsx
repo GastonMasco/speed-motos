@@ -72,9 +72,9 @@ export const Sidebar = memo(({ isOpen, onClose }) => {
 
         <div className="mt-auto p-4 border-t border-gray-800 bg-gray-950/40">
           <div className="text-[11px] text-gray-500 text-center">
-            Speed Rao Motos PWA v1.0
+            Motos Service Oraqueni PWA v1.0
             <br />
-            <span className="text-gray-400">Bolivia (Bs.)</span>
+            <span className="text-gray-400">La Paz, Bolivia (Bs.)</span>
           </div>
         </div>
       </aside>

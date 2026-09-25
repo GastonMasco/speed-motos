@@ -3,7 +3,7 @@ import { supabase } from '../config/supabase'
 
 export const DEFAULT_CONFIG = {
   id: 1,
-  nombre_negocio: 'Speed Rao Motos',
+  nombre_negocio: 'Motos Service Oraqueni',
   eslogan: 'Venta de Repuestos, Accesorios y Taller Especializado',
   direccion: 'La Paz, Bolivia',
   telefono: '+591 71234567',
