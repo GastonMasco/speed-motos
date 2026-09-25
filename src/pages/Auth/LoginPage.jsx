@@ -59,7 +59,7 @@ export default function LoginPage() {
             label="Correo Electrónico"
             type="email"
             icon={Mail}
-            placeholder="admin@speedmotos.com o mascogaston@gmail.com"
+            placeholder="mascogaston@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -77,25 +77,6 @@ export default function LoginPage() {
 
           <Button type="submit" fullWidth loading={loading} className="mt-2 py-2.5">
             Ingresar al Sistema
-          </Button>
-
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-gray-800"></div>
-            <span className="flex-shrink mx-2 text-[10px] uppercase tracking-wider text-gray-500 font-semibold">O acceso directo</span>
-            <div className="flex-grow border-t border-gray-800"></div>
-          </div>
-
-          <Button 
-            type="button" 
-            variant="secondary" 
-            fullWidth 
-            onClick={async () => {
-              await loginAsDirectAdmin('mascogaston@gmail.com', 'Gaston Masco (Administrador)')
-              navigate('/admin/inicio')
-            }} 
-            className="w-full py-2.5 border-rose-600/50 bg-rose-950/40 text-rose-300 hover:bg-rose-900/60 font-semibold text-xs flex items-center justify-center gap-2"
-          >
-            🛡️ Entrar como Administrador Principal (Acceso Directo)
           </Button>
         </form>
 

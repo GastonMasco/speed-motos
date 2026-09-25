@@ -74,16 +74,6 @@ export default function PendingPage() {
         </div>
 
         <div className="space-y-3 pt-2">
-          <Button
-            variant="success"
-            fullWidth
-            loading={checking}
-            onClick={handleActivateAdmin}
-            className="flex items-center justify-center gap-2 py-3 font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 text-xs"
-          >
-            🛡️ Activar mi cuenta como Administrador Principal
-          </Button>
-
           {!isSuspended && (
             <Button
               variant="secondary"
