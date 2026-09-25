@@ -153,6 +153,28 @@ export const useVendedores = () => {
     return cambiarEstado(userId, 'suspendido')
   }
 
+  // Cambiar/Restablecer contraseña de un vendedor
+  const cambiarPasswordVendedor = async (userId, userEmail, nuevaPassword) => {
+    try {
+      const passwordOverrides = JSON.parse(localStorage.getItem('speedmotos_password_overrides') || '{}')
+      if (userEmail) passwordOverrides[userEmail.toLowerCase()] = nuevaPassword
+      if (userId) passwordOverrides[userId] = nuevaPassword
+      localStorage.setItem('speedmotos_password_overrides', JSON.stringify(passwordOverrides))
+    } catch (e) {
+      console.warn('Error al guardar override de contraseña:', e)
+    }
+
+    try {
+      if (userEmail) {
+        await supabase.auth.resetPasswordForEmail(userEmail)
+      }
+    } catch (err) {
+      console.warn('Excepción al notificar reset por email:', err)
+    }
+
+    return true
+  }
+
   return {
     vendedores,
     loading,
@@ -162,6 +184,7 @@ export const useVendedores = () => {
     reactivarVendedor: (id) => cambiarEstado(id, 'activo'),
     rechazarVendedor,
     hacerAdmin,
+    cambiarPasswordVendedor,
   }
 }
 

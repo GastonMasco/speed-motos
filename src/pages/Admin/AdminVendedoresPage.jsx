@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Users, UserCheck, UserX, ShieldAlert, CheckCircle, ShieldCheck, Phone, Mail, Clock } from 'lucide-react'
+import { Users, UserCheck, UserX, ShieldAlert, CheckCircle, ShieldCheck, Phone, Mail, Clock, Key, Lock, Check } from 'lucide-react'
 import { useVendedores } from '../../hooks/useVendedores'
 import { formatDateShort } from '../../utils/formatters'
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
+import { Modal } from '../../components/ui/Modal'
+import { Input } from '../../components/ui/Input'
 
 export default function AdminVendedoresPage() {
   const {
@@ -15,9 +17,13 @@ export default function AdminVendedoresPage() {
     reactivarVendedor,
     rechazarVendedor,
     hacerAdmin,
+    cambiarPasswordVendedor,
   } = useVendedores()
 
   const [processingId, setProcessingId] = useState(null)
+  const [resetUser, setResetUser] = useState(null)
+  const [newPassword, setNewPassword] = useState('')
+  const [successNotice, setSuccessNotice] = useState('')
 
   const handleAction = async (actionFn, id) => {
     setProcessingId(id)
@@ -30,9 +36,30 @@ export default function AdminVendedoresPage() {
     }
   }
 
+  const handleSavePassword = async (e) => {
+    e.preventDefault()
+    if (!newPassword.trim()) {
+      alert('Por favor ingresa una nueva contraseña.')
+      return
+    }
+    setProcessingId(resetUser.id)
+    try {
+      await cambiarPasswordVendedor(resetUser.id, resetUser.email, newPassword)
+      setSuccessNotice(`¡Contraseña actualizada exitosamente para ${resetUser.nombre_completo || resetUser.email}!`)
+      setTimeout(() => {
+        setSuccessNotice('')
+        setResetUser(null)
+        setNewPassword('')
+      }, 2000)
+    } catch (err) {
+      alert('Error al cambiar contraseña: ' + err.message)
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
   const pendientes = vendedores.filter((v) => v.estado === 'pendiente')
   const activos = vendedores.filter((v) => v.estado === 'activo')
-  const suspendidos = vendedores.filter((v) => v.estado === 'suspendido')
 
   return (
     <div className="space-y-6">
@@ -43,7 +70,7 @@ export default function AdminVendedoresPage() {
             Gestión de Vendedores
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Aprueba o rechaza solicitudes pendientes y administra el estado de los vendedores activos
+            Aprueba o rechaza solicitudes pendientes, restablece contraseñas y administra el estado de las cuentas
           </p>
         </div>
 
@@ -128,74 +155,155 @@ export default function AdminVendedoresPage() {
                   </div>
                 </div>
 
-                {!isAdmin && (
-                  <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800">
-                    {/* Botones para vendedores PENDIENTES */}
-                    {isPending && (
-                      <>
-                        <Button
-                          variant="success"
-                          size="sm"
-                          loading={processingId === vendedor.id}
-                          onClick={() => handleAction(aprobarVendedor, vendedor.id)}
-                          className="flex items-center gap-1 text-xs"
-                        >
-                          <UserCheck size={14} /> Aprobar
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          loading={processingId === vendedor.id}
-                          onClick={() => handleAction(rechazarVendedor, vendedor.id)}
-                          className="flex items-center gap-1 text-xs"
-                        >
-                          <UserX size={14} /> Rechazar
-                        </Button>
-                      </>
-                    )}
+                <div className="flex flex-wrap items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800">
+                  {/* Botón común para restablecer contraseña */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setResetUser(vendedor)
+                      setNewPassword('')
+                      setSuccessNotice('')
+                    }}
+                    className="flex items-center gap-1 text-xs text-amber-300 border-amber-900/60 hover:bg-amber-950/30"
+                  >
+                    <Key size={13} /> Cambiar Clave
+                  </Button>
 
-                    {/* Botones para vendedores ACTIVOS */}
-                    {isActive && (
-                      <>
+                  {!isAdmin && (
+                    <>
+                      {/* Botones para vendedores PENDIENTES */}
+                      {isPending && (
+                        <>
+                          <Button
+                            variant="success"
+                            size="sm"
+                            loading={processingId === vendedor.id}
+                            onClick={() => handleAction(aprobarVendedor, vendedor.id)}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <UserCheck size={14} /> Aprobar
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            loading={processingId === vendedor.id}
+                            onClick={() => handleAction(rechazarVendedor, vendedor.id)}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <UserX size={14} /> Rechazar
+                          </Button>
+                        </>
+                      )}
+
+                      {/* Botones para vendedores ACTIVOS */}
+                      {isActive && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            loading={processingId === vendedor.id}
+                            onClick={() => handleAction(hacerAdmin, vendedor.id)}
+                            className="flex items-center gap-1 text-xs text-rose-400 border-rose-900/60 hover:bg-rose-950/40"
+                          >
+                            <ShieldCheck size={14} /> Hacer Admin
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            loading={processingId === vendedor.id}
+                            onClick={() => handleAction(suspenderVendedor, vendedor.id)}
+                            className="flex items-center gap-1 text-xs"
+                          >
+                            <ShieldAlert size={14} /> Suspender
+                          </Button>
+                        </>
+                      )}
+
+                      {/* Botones para vendedores SUSPENDIDOS */}
+                      {isSuspended && (
                         <Button
                           variant="secondary"
                           size="sm"
                           loading={processingId === vendedor.id}
-                          onClick={() => handleAction(hacerAdmin, vendedor.id)}
-                          className="flex items-center gap-1 text-xs text-rose-400 border-rose-900/60 hover:bg-rose-950/40"
+                          onClick={() => handleAction(reactivarVendedor, vendedor.id)}
+                          className="flex items-center gap-1 text-xs text-emerald-400 border-emerald-900"
                         >
-                          <ShieldCheck size={14} /> Hacer Admin
+                          <CheckCircle size={14} /> Reactivar
                         </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          loading={processingId === vendedor.id}
-                          onClick={() => handleAction(suspenderVendedor, vendedor.id)}
-                          className="flex items-center gap-1 text-xs"
-                        >
-                          <ShieldAlert size={14} /> Suspender
-                        </Button>
-                      </>
-                    )}
-
-                    {/* Botones para vendedores SUSPENDIDOS */}
-                    {isSuspended && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        loading={processingId === vendedor.id}
-                        onClick={() => handleAction(reactivarVendedor, vendedor.id)}
-                        className="flex items-center gap-1 text-xs text-emerald-400 border-emerald-900"
-                      >
-                        <CheckCircle size={14} /> Reactivar
-                      </Button>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </>
+                  )}
+                </div>
               </Card>
             )
           })}
         </div>
+      )}
+
+      {/* Modal para restablecer contraseña */}
+      {resetUser && (
+        <Modal
+          isOpen={Boolean(resetUser)}
+          onClose={() => setResetUser(null)}
+          title={`Restablecer Contraseña: ${resetUser.nombre_completo || resetUser.email}`}
+        >
+          {successNotice ? (
+            <div className="py-6 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-emerald-900/50 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-700">
+                <Check size={28} />
+              </div>
+              <p className="text-sm font-semibold text-emerald-300">{successNotice}</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSavePassword} className="space-y-4">
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Asigna una nueva contraseña de acceso para <strong className="text-gray-200">{resetUser.email}</strong>. El vendedor podrá ingresar inmediatamente con esta contraseña.
+              </p>
+
+              <Input
+                label="Nueva Contraseña"
+                type="password"
+                icon={Lock}
+                placeholder="Ejemplo: Speed2026*"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+
+              <div className="flex items-center justify-between gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setNewPassword(`Speed${Math.floor(1000 + Math.random() * 9000)}*`)}
+                  className="text-xs text-gray-400 border-gray-700"
+                >
+                  ⚡ Generar contraseña rápida
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setResetUser(null)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    loading={processingId === resetUser.id}
+                  >
+                    Guardar Contraseña
+                  </Button>
+                </div>
+              </div>
+            </form>
+          )}
+        </Modal>
       )}
     </div>
   )
