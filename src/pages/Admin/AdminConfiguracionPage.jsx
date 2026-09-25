@@ -213,7 +213,7 @@ export default function AdminConfiguracionPage({ defaultTab = 'negocio' }) {
 
             <Input
               label="Dirección Física del Local *"
-              placeholder="Av. Blanco Galindo Km 3.5, Cochabamba"
+              placeholder="La Paz, Bolivia"
               value={businessForm.direccion}
               onChange={(e) => setBusinessForm({ ...businessForm, direccion: e.target.value })}
               required

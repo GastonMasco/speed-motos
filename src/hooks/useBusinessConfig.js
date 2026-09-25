@@ -5,7 +5,7 @@ export const DEFAULT_CONFIG = {
   id: 1,
   nombre_negocio: 'Speed Rao Motos',
   eslogan: 'Venta de Repuestos, Accesorios y Taller Especializado',
-  direccion: 'Av. Blanco Galindo Km 3.5, Cochabamba, Bolivia',
+  direccion: 'La Paz, Bolivia',
   telefono: '+591 71234567',
   nit: '1028374029',
   markup_global_defecto: 40.0,

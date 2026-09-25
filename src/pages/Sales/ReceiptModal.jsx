@@ -16,7 +16,7 @@ export const ReceiptModal = ({
   const company = {
     NOMBRE: config.nombre_negocio || 'Speed Rao Motos',
     ESLOGAN: config.eslogan || 'Venta de Repuestos, Accesorios y Taller Especializado',
-    DIRECCION: config.direccion || 'Av. Blanco Galindo Km 3.5, Cochabamba, Bolivia',
+    DIRECCION: config.direccion || 'La Paz, Bolivia',
     TELEFONO: config.telefono || '+591 71234567',
     NIT: config.nit || '1028374029',
   }

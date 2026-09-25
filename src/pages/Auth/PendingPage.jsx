@@ -99,7 +99,7 @@ export default function PendingPage() {
         </div>
 
         <div className="mt-6 pt-4 border-t border-gray-800 text-[11px] text-gray-500 flex items-center justify-center gap-1">
-          <Wrench size={12} /> Speed Rao Motos - Cochabamba, Bolivia
+          <Wrench size={12} /> Speed Rao Motos - La Paz, Bolivia
         </div>
       </div>
     </div>

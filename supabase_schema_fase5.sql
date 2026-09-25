@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.configuracion_negocio (
   id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   nombre_negocio TEXT NOT NULL DEFAULT 'Speed Rao Motos',
   eslogan TEXT DEFAULT 'Venta de Repuestos, Accesorios y Taller Especializado',
-  direccion TEXT DEFAULT 'Av. Blanco Galindo Km 3.5, Cochabamba, Bolivia',
+  direccion TEXT DEFAULT 'La Paz, Bolivia',
   telefono TEXT DEFAULT '+591 71234567',
   nit TEXT DEFAULT '1028374029',
   markup_global_defecto NUMERIC(5,2) NOT NULL DEFAULT 40.00,
@@ -22,7 +22,7 @@ INSERT INTO public.configuracion_negocio (
 )
 VALUES (
   1, 'Speed Rao Motos', 'Venta de Repuestos, Accesorios y Taller Especializado',
-  'Av. Blanco Galindo Km 3.5, Cochabamba, Bolivia', '+591 71234567', '1028374029', 40.00, 15.00
+  'La Paz, Bolivia', '+591 71234567', '1028374029', 40.00, 15.00
 )
 ON CONFLICT (id) DO NOTHING;
 
