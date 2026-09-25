@@ -100,7 +100,7 @@ export const useSuppliers = () => {
         return {
           lista_id: newListRecord.id,
           codigo_proveedor: item.codigo_proveedor || '',
-          nombre: item.nombre,
+          nombre: item.nombre || 'Repuesto sin nombre',
           marca: item.marca || 'GENERICO',
           categoria_sugerida: item.categoria_sugerida || 'varios',
           compatibilidad_sugerida: Array.isArray(item.compatibilidad_sugerida) ? item.compatibilidad_sugerida : [],
@@ -129,7 +129,10 @@ export const useSuppliers = () => {
     } catch (err) {
       console.error('Error al procesar lista PDF:', err)
       if (newListRecord?.id) {
-        await supabase.from('listas_proveedor').delete().eq('id', newListRecord.id)
+        await supabase.from('listas_proveedor').delete().eq('id', newListRecord.id).catch(() => {})
+      }
+      if (err.message?.includes('row-level security') || err.message?.includes('policy')) {
+        throw new Error('Error de permisos en Supabase (RLS): No tienes permiso para escribir en la tabla. Por favor ejecuta el script SQL "fix_rls_policies.sql" en la consola de Supabase.')
       }
       throw err
     } finally {

@@ -154,17 +154,15 @@ DROP POLICY IF EXISTS "Permitir lectura listas" ON public.listas_proveedor;
 CREATE POLICY "Permitir lectura listas" ON public.listas_proveedor FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Permitir escritura listas admin" ON public.listas_proveedor;
-CREATE POLICY "Permitir escritura listas admin" ON public.listas_proveedor FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND rol = 'admin')
-);
+DROP POLICY IF EXISTS "Permitir escritura listas" ON public.listas_proveedor;
+CREATE POLICY "Permitir escritura listas" ON public.listas_proveedor FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Permitir lectura items_extraidos" ON public.items_extraidos;
 CREATE POLICY "Permitir lectura items_extraidos" ON public.items_extraidos FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Permitir escritura items_extraidos admin" ON public.items_extraidos;
-CREATE POLICY "Permitir escritura items_extraidos admin" ON public.items_extraidos FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND rol = 'admin')
-);
+DROP POLICY IF EXISTS "Permitir escritura items_extraidos" ON public.items_extraidos;
+CREATE POLICY "Permitir escritura items_extraidos" ON public.items_extraidos FOR ALL USING (true) WITH CHECK (true);
 
 -- 6. INSERCIÓN DE PROVEEDORES BASE (Si no existen)
 INSERT INTO public.proveedores (nombre, telefono, notas) VALUES
